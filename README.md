@@ -1,8 +1,5 @@
 # codeserver-dark-glass
 
-<!-- Badges removed/updated for this fork -->
-
-
 ## **THIS THEME IS STILL A WORK IN PROGRESS**
 
 Codeserver uses different policies and file locations, as such there are still a few things to work out. 
@@ -11,7 +8,7 @@ Also, CustomUI does not work with Code-Server, but there is a way to inject a cs
 
 A dark color theme for code-server with a modern glass-inspired aesthetic. Features custom background, rounded corners, and refined UI elements.
 
-![Islands Dark Screenshot](assets/CleanShot%202026-02-14%20at%2021.47.05@2x.png)
+![Dark Glass Screenshot](assets/dark-glass.png)
 
 ## Features
 
@@ -24,7 +21,7 @@ A dark color theme for code-server with a modern glass-inspired aesthetic. Featu
 - Warm syntax highlighting with comprehensive language support (JS/TS, Python, Go, Rust, HTML/CSS, JSON, YAML, Markdown)
 - Compatible with code-server
 
-![Islands Dark Screenshot UI](assets/CleanShot%202026-02-14%20at%2021.45.00@2x.png)
+
 
 ## Installation
 
