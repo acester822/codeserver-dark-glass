@@ -255,9 +255,10 @@ If Custom UI Style doesn't work in code-server:
 
 ### code-server: Fonts not displaying correctly
 Web-based environments like code-server may have font limitations:
-1. Bear Sans UI font may not work - the theme will fall back to system sans-serif
-2. IBM Plex Mono and FiraCode Nerd Font Mono need to be installed on your local machine for proper display
-3. Alternatively, you can use web-safe fonts by updating the settings to use `'Consolas', 'Monaco', 'Courier New'` or similar
+1. Bear Sans UI font may not work in the browser - the theme will fall back to system sans-serif
+2. IBM Plex Mono and FiraCode Nerd Font Mono need to be installed on your **client machine** (the computer you're using to access code-server in the browser) for proper display
+3. Note: Installing fonts on the server hosting code-server will not affect browser display
+4. Alternatively, you can use web-safe fonts by updating the settings to use `'Consolas', 'Monaco', 'Courier New'` or similar, which are available in most browsers
 
 ### Previously used "Custom CSS and JS Loader" extension
 If you previously used the **Custom CSS and JS Loader** extension (`be5invis.vscode-custom-css`), it may have injected CSS directly into VS Code's `workbench.html` that persists even after disabling. If styles conflict, reinstall VS Code to get a clean `workbench.html`, then use only **Custom UI Style**.
