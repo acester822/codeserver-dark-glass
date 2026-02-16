@@ -12,8 +12,18 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if code command is available
-if ! command -v code &> /dev/null; then
+# Detect if running in code-server environment
+IS_CODE_SERVER=false
+if [ -n "$CODE_SERVER" ] || command -v code-server &> /dev/null; then
+    IS_CODE_SERVER=true
+    echo -e "${GREEN}✓ code-server environment detected${NC}"
+elif [ -d "$HOME/.local/share/code-server" ] || [ -d "$HOME/Library/Application Support/code-server" ]; then
+    IS_CODE_SERVER=true
+    echo -e "${GREEN}✓ code-server environment detected${NC}"
+fi
+
+# Check if code command is available (for desktop VS Code)
+if ! command -v code &> /dev/null && [ "$IS_CODE_SERVER" = false ]; then
     echo -e "${RED}❌ Error: VS Code CLI (code) not found!${NC}"
     echo "Please install VS Code and make sure 'code' command is in your PATH."
     echo "You can do this by:"
@@ -23,7 +33,9 @@ if ! command -v code &> /dev/null; then
     exit 1
 fi
 
-echo -e "${GREEN}✓ VS Code CLI found${NC}"
+if [ "$IS_CODE_SERVER" = false ]; then
+    echo -e "${GREEN}✓ VS Code CLI found${NC}"
+fi
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -31,8 +43,19 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo ""
 echo "📦 Step 1: Installing Islands Dark theme extension..."
 
-# Install by copying to VS Code extensions directory
-EXT_DIR="$HOME/.vscode/extensions/bwya77.islands-dark-1.0.0"
+# Determine extensions directory based on environment
+if [ "$IS_CODE_SERVER" = true ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        EXT_BASE="$HOME/Library/Application Support/code-server/extensions"
+    else
+        EXT_BASE="$HOME/.local/share/code-server/extensions"
+    fi
+else
+    EXT_BASE="$HOME/.vscode/extensions"
+fi
+
+# Install by copying to extensions directory
+EXT_DIR="$EXT_BASE/bwya77.islands-dark-1.0.0"
 rm -rf "$EXT_DIR"
 mkdir -p "$EXT_DIR"
 cp "$SCRIPT_DIR/package.json" "$EXT_DIR/"
@@ -47,7 +70,11 @@ fi
 
 echo ""
 echo "🔧 Step 2: Installing Custom UI Style extension..."
-if code --install-extension subframe7536.custom-ui-style --force; then
+if [ "$IS_CODE_SERVER" = true ]; then
+    echo -e "${YELLOW}⚠️  code-server detected: Custom UI Style extension needs manual installation${NC}"
+    echo "   Please install it manually from the Extensions marketplace in code-server"
+    echo "   Search for: Custom UI Style (by subframe7536)"
+elif code --install-extension subframe7536.custom-ui-style --force; then
     echo -e "${GREEN}✓ Custom UI Style extension installed${NC}"
 else
     echo -e "${YELLOW}⚠️  Could not install Custom UI Style extension automatically${NC}"
@@ -78,9 +105,19 @@ fi
 
 echo ""
 echo "⚙️  Step 4: Applying VS Code settings..."
-SETTINGS_DIR="$HOME/.config/Code/User"
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    SETTINGS_DIR="$HOME/Library/Application Support/Code/User"
+# Determine settings directory based on environment
+if [ "$IS_CODE_SERVER" = true ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        SETTINGS_DIR="$HOME/Library/Application Support/code-server/User"
+    else
+        SETTINGS_DIR="$HOME/.local/share/code-server/User"
+    fi
+else
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        SETTINGS_DIR="$HOME/Library/Application Support/Code/User"
+    else
+        SETTINGS_DIR="$HOME/.config/Code/User"
+    fi
 fi
 
 mkdir -p "$SETTINGS_DIR"
@@ -97,7 +134,7 @@ if [ -f "$SETTINGS_FILE" ]; then
 
     # Create a temporary file with the merge logic using node.js if available
     if command -v node &> /dev/null; then
-        node << 'NODE_SCRIPT'
+        IS_CODE_SERVER=$IS_CODE_SERVER node << 'NODE_SCRIPT'
 const fs = require('fs');
 const path = require('path');
 
@@ -116,10 +153,19 @@ const scriptDir = process.cwd();
 const newSettings = JSON.parse(stripJsonc(fs.readFileSync(path.join(scriptDir, 'settings.json'), 'utf8')));
 
 let settingsDir;
-if (process.platform === 'darwin') {
-    settingsDir = path.join(process.env.HOME, 'Library/Application Support/Code/User');
+const isCodeServer = process.env.IS_CODE_SERVER === 'true';
+if (isCodeServer) {
+    if (process.platform === 'darwin') {
+        settingsDir = path.join(process.env.HOME, 'Library/Application Support/code-server/User');
+    } else {
+        settingsDir = path.join(process.env.HOME, '.local/share/code-server/User');
+    }
 } else {
-    settingsDir = path.join(process.env.HOME, '.config/Code/User');
+    if (process.platform === 'darwin') {
+        settingsDir = path.join(process.env.HOME, 'Library/Application Support/Code/User');
+    } else {
+        settingsDir = path.join(process.env.HOME, '.config/Code/User');
+    }
 }
 
 const settingsFile = path.join(settingsDir, 'settings.json');
@@ -152,8 +198,7 @@ else
 fi
 
 echo ""
-echo "🚀 Step 5: Enabling Custom UI Style..."
-echo "   VS Code will reload after applying changes..."
+echo "🚀 Step 5: Finalizing installation..."
 
 # Create a flag file to indicate first run
 FIRST_RUN_FILE="$SCRIPT_DIR/.islands_dark_first_run"
@@ -162,31 +207,39 @@ if [ ! -f "$FIRST_RUN_FILE" ]; then
     echo ""
     echo -e "${YELLOW}📝 Important Notes:${NC}"
     echo "   • IBM Plex Mono and FiraCode Nerd Font Mono need to be installed separately"
-    echo "   • After VS Code reloads, you may see a 'corrupt installation' warning"
-    echo "   • This is expected - click the gear icon and select 'Don't Show Again'"
+    if [ "$IS_CODE_SERVER" = false ]; then
+        echo "   • After VS Code reloads, you may see a 'corrupt installation' warning"
+        echo "   • This is expected - click the gear icon and select 'Don't Show Again'"
+    else
+        echo "   • For code-server: Reload the browser page to apply changes"
+        echo "   • Enable Custom UI Style from the Command Palette after reload"
+    fi
     echo ""
     if [ -t 0 ]; then
-        read -p "Press Enter to continue and reload VS Code..."
+        read -p "Press Enter to continue..."
     fi
 fi
 
-# Apply custom UI style
-echo "   Applying CSS customizations..."
-
-# Reload VS Code to apply changes
+# Reload to apply changes
 echo -e "${GREEN}✓ Setup complete!${NC}"
 echo ""
 echo "🎉 Islands Dark theme has been installed!"
-echo "   VS Code will now reload to apply the custom UI style."
-echo ""
 
-# Use AppleScript on macOS to show a notification and reload VS Code
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    osascript -e 'display notification "Islands Dark theme installed successfully!" with title "🏝️ Islands Dark"' 2>/dev/null || true
+if [ "$IS_CODE_SERVER" = true ]; then
+    echo "   Please reload your browser page to apply changes."
+    echo "   Then enable Custom UI Style from the Command Palette (Ctrl+Shift+P)"
+else
+    echo "   VS Code will now reload to apply the custom UI style."
+    echo ""
+    
+    # Use AppleScript on macOS to show a notification and reload VS Code
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        osascript -e 'display notification "Islands Dark theme installed successfully!" with title "🏝️ Islands Dark"' 2>/dev/null || true
+    fi
+
+    echo "   Reloading VS Code..."
+    code --reload-window 2>/dev/null || code . 2>/dev/null || true
 fi
-
-echo "   Reloading VS Code..."
-code --reload-window 2>/dev/null || code . 2>/dev/null || true
 
 echo ""
 echo -e "${GREEN}Done! 🏝️${NC}"

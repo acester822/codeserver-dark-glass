@@ -34,6 +34,8 @@ A dark color theme for Visual Studio Code inspired by JetBrains' Islands Dark th
 
 This theme has two parts: a **color theme** and **CSS customizations** that create the floating glass panel look.
 
+> **💡 Note:** This theme works with both **VS Code Desktop** and **code-server** (web-based VS Code). The installation scripts automatically detect your environment and install to the correct locations.
+
 ### One-Liner Install (Recommended)
 
 The fastest way to install:
@@ -49,6 +51,8 @@ curl -fsSL https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/boo
 ```powershell
 irm https://raw.githubusercontent.com/bwya77/vscode-dark-islands/main/bootstrap.ps1 | iex
 ```
+
+> **📝 For code-server users:** The scripts will automatically detect code-server and install to the appropriate directories (`~/.local/share/code-server/` on Linux, `~/Library/Application Support/code-server/` on macOS, or `%APPDATA%\code-server\` on Windows). After installation, reload your browser page and manually install the **Custom UI Style** extension from the Extensions marketplace.
 
 ### Manual Clone Install
 
@@ -87,6 +91,8 @@ If you prefer to install manually, follow these steps:
 
 Clone this repo and copy the extension files:
 
+**For VS Code Desktop:**
+
 ```bash
 git clone https://github.com/bwya77/vscode-dark-islands.git islands-dark
 cd islands-dark
@@ -95,11 +101,41 @@ cp package.json ~/.vscode/extensions/bwya77.islands-dark-1.0.0/
 cp -r themes ~/.vscode/extensions/bwya77.islands-dark-1.0.0/
 ```
 
-On Windows (PowerShell):
+**For code-server (Linux):**
+
+```bash
+git clone https://github.com/bwya77/vscode-dark-islands.git islands-dark
+cd islands-dark
+mkdir -p ~/.local/share/code-server/extensions/bwya77.islands-dark-1.0.0
+cp package.json ~/.local/share/code-server/extensions/bwya77.islands-dark-1.0.0/
+cp -r themes ~/.local/share/code-server/extensions/bwya77.islands-dark-1.0.0/
+```
+
+**For code-server (macOS):**
+
+```bash
+git clone https://github.com/bwya77/vscode-dark-islands.git islands-dark
+cd islands-dark
+mkdir -p ~/Library/Application\ Support/code-server/extensions/bwya77.islands-dark-1.0.0
+cp package.json ~/Library/Application\ Support/code-server/extensions/bwya77.islands-dark-1.0.0/
+cp -r themes ~/Library/Application\ Support/code-server/extensions/bwya77.islands-dark-1.0.0/
+```
+
+On Windows (PowerShell) for VS Code Desktop:
 ```powershell
 git clone https://github.com/bwya77/vscode-dark-islands.git islands-dark
 cd islands-dark
 $ext = "$env:USERPROFILE\.vscode\extensions\bwya77.islands-dark-1.0.0"
+New-Item -ItemType Directory -Path $ext -Force
+Copy-Item package.json $ext\
+Copy-Item themes $ext\themes -Recurse
+```
+
+On Windows (PowerShell) for code-server:
+```powershell
+git clone https://github.com/bwya77/vscode-dark-islands.git islands-dark
+cd islands-dark
+$ext = "$env:APPDATA\code-server\extensions\bwya77.islands-dark-1.0.0"
 New-Item -ItemType Directory -Path $ext -Force
 Copy-Item package.json $ext\
 Copy-Item themes $ext\themes -Recurse
@@ -138,11 +174,24 @@ If you prefer different fonts, update the `editor.fontFamily`, `terminal.integra
 
 #### Step 6: Apply the settings
 
-Copy the contents of `settings.json` from this repo into your VS Code: settings:
+Copy the contents of `settings.json` from this repo into your settings:
+
+**For VS Code Desktop:**
 
 1. Open **Command Palette** (`Cmd+Shift+P` / `Ctrl+Shift+P`)
 2. Search for **Preferences: Open User Settings (JSON)**
 3. Merge the contents of this repo's `settings.json` into your settings file
+
+**For code-server:**
+
+1. Open **Command Palette** (`Cmd+Shift+P` / `Ctrl+Shift+P`)
+2. Search for **Preferences: Open User Settings (JSON)**
+3. Merge the contents of this repo's `settings.json` into your settings file
+
+The settings file locations are:
+- **Linux (code-server):** `~/.local/share/code-server/User/settings.json`
+- **macOS (code-server):** `~/Library/Application Support/code-server/User/settings.json`
+- **Windows (code-server):** `%APPDATA%\code-server\User\settings.json`
 
 > **Note:** If you already have existing settings, merge carefully. The key settings are `workbench.colorTheme`, `custom-ui-style.stylesheet`, and the font/indent preferences.
 
@@ -178,12 +227,37 @@ Copy the contents of `settings.json` from this repo into your VS Code: settings:
 ### Changes aren't taking effect
 Try disabling and re-enabling Custom UI Style:
 1. **Command Palette** > **Custom UI Style: Disable**
-2. Reload VS Code
+2. Reload VS Code / Reload browser (for code-server)
 3. **Command Palette** > **Custom UI Style: Enable**
-4. Reload VS Code
+4. Reload VS Code / Reload browser (for code-server)
 
 ### "Corrupt installation" warning
-This is expected after enabling Custom UI Style. Dismiss it or select **Don't Show Again**.
+This is expected after enabling Custom UI Style on VS Code Desktop. Dismiss it or select **Don't Show Again**. This warning does not appear in code-server.
+
+### code-server: Theme not applying
+If the theme isn't applying in code-server:
+1. Verify the theme is installed in the correct directory:
+   - Linux: `~/.local/share/code-server/extensions/bwya77.islands-dark-1.0.0/`
+   - macOS: `~/Library/Application Support/code-server/extensions/bwya77.islands-dark-1.0.0/`
+   - Windows: `%APPDATA%\code-server\extensions\bwya77.islands-dark-1.0.0\`
+2. Make sure Custom UI Style extension is installed from the Extensions marketplace
+3. Check that settings are in the correct location (see Step 6 above)
+4. Reload the browser page completely (not just VS Code window)
+5. Check browser console for any errors (F12 Developer Tools)
+
+### code-server: Custom UI Style not working
+If Custom UI Style doesn't work in code-server:
+1. Ensure you're using a recent version of code-server (v4.0.0+)
+2. Some code-server deployments may have restrictions on custom CSS injection
+3. Check your code-server's `--disable-file-downloads` or security settings
+4. Try disabling and re-enabling the extension
+5. Check the Extensions view to ensure Custom UI Style is enabled
+
+### code-server: Fonts not displaying correctly
+Web-based environments like code-server may have font limitations:
+1. Bear Sans UI font may not work - the theme will fall back to system sans-serif
+2. IBM Plex Mono and FiraCode Nerd Font Mono need to be installed on your local machine for proper display
+3. Alternatively, you can use web-safe fonts by updating the settings to use `'Consolas', 'Monaco', 'Courier New'` or similar
 
 ### Previously used "Custom CSS and JS Loader" extension
 If you previously used the **Custom CSS and JS Loader** extension (`be5invis.vscode-custom-css`), it may have injected CSS directly into VS Code's `workbench.html` that persists even after disabling. If styles conflict, reinstall VS Code to get a clean `workbench.html`, then use only **Custom UI Style**.
