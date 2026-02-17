@@ -115,11 +115,10 @@ if [ -f "$SETTINGS_FILE" ]; then
     cp "$SETTINGS_FILE" "$SETTINGS_FILE.backup"
 
     # Read the existing settings and merge
-    echo "   Merging Islands Dark settings with your existing settings..."
+    echo "   Merging Dark Glass settings with your existing settings..."
 
         # Merge settings using Node.js
-        SCRIPT_DIR_ESCAPED=$(printf '%s\n' "$SCRIPT_DIR" | sed 's/[\/&]/\\&/g')
-        node << NODE_SCRIPT
+        node << EOF
 const fs = require('fs');
 const path = require('path');
 
@@ -130,7 +129,7 @@ function stripJsonc(text) {
     // Remove multi-line comments
     text = text.replace(/\/\*[\s\S]*?\*\//g, '');
     // Remove trailing commas before } or ]
-    text = text.replace(/,\s*([}\]])/g, '$1');
+    text = text.replace(/,\s*([}\]])/g, '\$1');
     return text;
 }
 
@@ -166,8 +165,8 @@ if (existingSettings[stylesheetKey] && newSettings[stylesheetKey]) {
 fs.mkdirSync(settingsDir, { recursive: true });
 fs.writeFileSync(userSettingsFile, JSON.stringify(mergedSettings, null, 2));
 console.log('Settings merged successfully');
-NODE_SCRIPT
-else
+EOF
+    echo -e "${GREEN}✓ Settings merged${NC}"
     # No existing settings, just copy
     cp "$SCRIPT_DIR/settings.json" "$SETTINGS_FILE"
     echo -e "${GREEN}✓ Settings applied${NC}"
