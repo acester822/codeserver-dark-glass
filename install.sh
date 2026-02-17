@@ -10,6 +10,7 @@ echo ""
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Check for code-server CLI
@@ -73,7 +74,7 @@ if [ ! -f "$SCRIPT_DIR/package.json" ]; then
 fi
 
 echo ""
-echo "📦 Step 1: Installing Ace911's Dark Glass Theme extension..."
+echo -e "${BLUE}📦 Step 1: Installing Ace911's Dark Glass Theme extension...${NC}"
 
 # Read extension identity from package.json so we don't hard-code the publisher/name/version
 EXT_PUBLISHER=$(sed -n 's/.*"publisher"\s*:\s*"\([^"]*\)".*/\1/p' "$SCRIPT_DIR/package.json" || true)
@@ -143,17 +144,24 @@ extensions.push({
 });
 
 fs.writeFileSync(extJson, JSON.stringify(extensions, null, 4));
-console.log('Extension registered in extensions.json');
+// extension registration performed (console output suppressed)
 REGEOF
     node "$REGISTER_SCRIPT" "$EXT_JSON" "$EXT_ID" "$EXT_DIR" "$EXT_RELATIVE" "$EXT_VERSION"
     rm -f "$REGISTER_SCRIPT"
-    echo -e "${GREEN}✓ Extension registered with code-server${NC}"
+    echo -e "${GREEN}✓ Extension registered in extensions.json${NC}"
+
+    # Recommended icon theme — install alongside the extension (Step 1)
+    if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force 2>/dev/null; then
+        echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
+    fi
 else
     echo -e "${YELLOW}⚠️  extensions.json not found — code-server should still detect the theme on restart${NC}"
 fi
 
 echo ""
-echo "⚙️  Step 2: Applying VS Code settings..."
+    echo -e "${BLUE}⚙️  Step 2: Applying VS Code settings...${NC}"
 # Use code-server user settings directory exclusively
 SETTINGS_DIR="$HOME/.local/share/code-server/User"
 
@@ -253,7 +261,7 @@ if (existingSettings[stylesheetKey] && newSettings[stylesheetKey]) {
 
 fs.mkdirSync(settingsDir, { recursive: true });
 fs.writeFileSync(userSettingsFile, JSON.stringify(mergedSettings, null, 2));
-console.log('Settings merged successfully');
+    // settings merged (suppressed extra console output)
 NODEJS_EOF
         
         # Run the script and clean up
@@ -267,13 +275,11 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}Done! 🏝️${NC}"
 
 echo ""
-echo "🔧 Step 3: Add Custom Theming Capabilities to Code-Server"
+echo -e "${BLUE}🔧 Step 3: Add Custom Theming Capabilities to Code-Server${NC}"
 echo "  • Copies 'custom/' into your code-server user data"
 echo "  • Injects an @import into workbench.css and creates a symlink from the workbench folder to your user 'custom' folder"
-echo "  • Installs the Seti Folder icon theme (recommended)"
 
 CUSTOM_SRC="$SCRIPT_DIR/custom"
 USER_CUSTOM_DIR="$HOME/.local/share/code-server/custom"
@@ -341,17 +347,9 @@ else
     sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" || echo "    ⚠️  failed to create symlink (permission denied)"
 fi
 
-# install recommended icon theme for best results
-echo ""
-echo "• Installing recommended icon theme: l-igh-t.vscode-theme-seti-folder"
-if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force 2>/dev/null; then
-    echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
-else
-    echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
-fi
-
 echo ""
 echo -e "${GREEN}✅ Built-in custom theming steps complete${NC}"
 echo "Restart code-server (or refresh browser) to see changes."
 echo ""
-echo "• workbench.css -> $WORKBENCH_CSS"
+echo -e "${GREEN}Done! 🏝️${NC}"
+echo ""
