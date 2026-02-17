@@ -151,10 +151,16 @@ REGEOF
     echo -e "${GREEN}✓ Extension registered in extensions.json${NC}"
 
     # Recommended icon theme — install alongside the extension (Step 1)
-    if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force 2>/dev/null; then
-        echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
+    if command -v code-server &> /dev/null; then
+        if code-server --list-extensions 2>/dev/null | grep -xq 'l-igh-t.vscode-theme-seti-folder'; then
+            echo -e "${YELLOW}⚠️  Extension 'l-igh-t.vscode-theme-seti-folder' is already installed.${NC}"
+        else
+            if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force >/dev/null 2>&1; then
+                echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
+            else
+                echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
+            fi
+        fi
     fi
 else
     echo -e "${YELLOW}⚠️  extensions.json not found — code-server should still detect the theme on restart${NC}"
@@ -278,8 +284,9 @@ echo ""
 
 echo ""
 echo -e "${BLUE}🔧 Step 3: Add Custom Theming Capabilities to Code-Server${NC}"
-echo "  • Copies 'custom/' into your code-server user data"
-echo "  • Injects an @import into workbench.css and creates a symlink from the workbench folder to your user 'custom' folder"
+echo "  • Adding a custom directory"
+echo "  • Injecting CSS import into workbench"
+echo "  • Creating workbench -> custom symlink"
 
 CUSTOM_SRC="$SCRIPT_DIR/custom"
 USER_CUSTOM_DIR="$HOME/.local/share/code-server/custom"
@@ -350,6 +357,12 @@ fi
 echo ""
 echo -e "${GREEN}✅ Built-in custom theming steps complete${NC}"
 echo "Restart code-server (or refresh browser) to see changes."
+echo ""
+echo "Relevant locations:"
+echo "  Custom Theme Folder: $USER_CUSTOM_DIR"
+if [ -n "$WORKBENCH_CSS" ]; then
+    echo "  Custom Theme Folder Symlink Location: $WORKBENCH_DIR/custom"
+fi
 echo ""
 echo -e "${GREEN}Done! 🏝️${NC}"
 echo ""
