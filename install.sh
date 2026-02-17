@@ -100,6 +100,58 @@ else
     exit 1
 fi
 
+# Register the extension in code-server's extensions.json
+EXT_JSON="$HOME/.local/share/code-server/extensions/extensions.json"
+EXT_ID="${EXT_PUBLISHER}.${EXT_NAME}"
+EXT_RELATIVE="${EXT_PUBLISHER}.${EXT_NAME}-${EXT_VERSION}"
+
+if [ -f "$EXT_JSON" ]; then
+    # Remove any existing entry for this extension, then append a new one
+    REGISTER_SCRIPT=$(mktemp /tmp/register-ext.XXXXX.js)
+    cat > "$REGISTER_SCRIPT" << 'REGEOF'
+const fs = require('fs');
+const extJson = process.argv[2];
+const extId = process.argv[3];
+const extDir = process.argv[4];
+const extRelative = process.argv[5];
+const extVersion = process.argv[6];
+
+let extensions = [];
+try {
+    extensions = JSON.parse(fs.readFileSync(extJson, 'utf8'));
+} catch (e) {
+    extensions = [];
+}
+
+// Remove existing entry for this extension
+extensions = extensions.filter(e => e.identifier && e.identifier.id !== extId);
+
+// Add new entry
+extensions.push({
+    identifier: { id: extId },
+    version: extVersion,
+    location: {
+        "$mid": 1,
+        path: extDir,
+        scheme: "file"
+    },
+    relativeLocation: extRelative,
+    metadata: {
+        installedTimestamp: Date.now(),
+        source: "user"
+    }
+});
+
+fs.writeFileSync(extJson, JSON.stringify(extensions, null, 4));
+console.log('Extension registered in extensions.json');
+REGEOF
+    node "$REGISTER_SCRIPT" "$EXT_JSON" "$EXT_ID" "$EXT_DIR" "$EXT_RELATIVE" "$EXT_VERSION"
+    rm -f "$REGISTER_SCRIPT"
+    echo -e "${GREEN}✓ Extension registered with code-server${NC}"
+else
+    echo -e "${YELLOW}⚠️  extensions.json not found — code-server should still detect the theme on restart${NC}"
+fi
+
 echo ""
 echo "⚙️  Step 2: Applying VS Code settings..."
 # Use code-server user settings directory exclusively
