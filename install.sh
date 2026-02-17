@@ -270,11 +270,11 @@ echo ""
 echo -e "${GREEN}Done! 🏝️${NC}"
 
 echo ""
-echo "🔧 Step 3: (optional) Install CSS directly into code-server (no Custom UI Style)"
-echo "    — will copy 'custom/' into your code-server user data, inject an @import into workbench.css,
-            create a symlink from the workbench folder to the user 'custom' folder, and install Seti Folder icon theme."
+echo "🔧 Step 3: Add Custom Theming Capabilities to Code-Server"
+echo "  • Copies 'custom/' into your code-server user data"
+echo "  • Injects an @import into workbench.css and creates a symlink from the workbench folder to your user 'custom' folder"
+echo "  • Installs the Seti Folder icon theme (recommended)"
 
-# Direct-theming steps provided by user (idempotent where possible)
 CUSTOM_SRC="$SCRIPT_DIR/custom"
 USER_CUSTOM_DIR="$HOME/.local/share/code-server/custom"
 WORKBENCH_CANDIDATES=(
@@ -282,7 +282,8 @@ WORKBENCH_CANDIDATES=(
     "/usr/lib/code-server/lib/vscode/out/vs/workbench/workbench.css"
 )
 
-echo "\n• Adjusting ownership so code-server can load user customizations (sudo may be required)"
+echo ""
+echo "• Adjusting ownership so code-server can load user customizations (sudo may be required)"
 for d in "$HOME/.config/code-server" "$HOME/.local/share/code-server" "/usr/lib/code-server"; do
     if [ -d "$d" ]; then
         echo "  - chown $d -> $(whoami)"
@@ -307,7 +308,8 @@ fi
 if [ -z "$WORKBENCH_CSS" ]; then
     echo -e "${YELLOW}⚠️  workbench.css not found under /usr/lib/code-server — skipping CSS injection step${NC}"
 else
-    echo "\n• workbench.css -> $WORKBENCH_CSS"
+    echo ""
+    echo "• workbench.css -> $WORKBENCH_CSS"
 
     # backup and inject import if missing
     if sudo grep -q '@import url("./custom/active.css");' "$WORKBENCH_CSS" 2>/dev/null; then
@@ -340,12 +342,16 @@ else
 fi
 
 # install recommended icon theme for best results
-echo "\n• Installing recommended icon theme: l-igh-t.vscode-theme-seti-folder"
+echo ""
+echo "• Installing recommended icon theme: l-igh-t.vscode-theme-seti-folder"
 if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force 2>/dev/null; then
     echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
 else
     echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
 fi
 
-echo "\n✅ Built-in custom theming steps complete. Restart code-server (or refresh browser) to see changes."
-    echo "\n• workbench.css -> $WORKBENCH_CSS"
+echo ""
+echo -e "${GREEN}✅ Built-in custom theming steps complete${NC}"
+echo "Restart code-server (or refresh browser) to see changes."
+echo ""
+echo "• workbench.css -> $WORKBENCH_CSS"
