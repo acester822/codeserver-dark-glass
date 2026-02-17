@@ -117,8 +117,9 @@ if [ -f "$SETTINGS_FILE" ]; then
     # Read the existing settings and merge
     echo "   Merging Dark Glass settings with your existing settings..."
 
-        # Merge settings using Node.js - pass SCRIPT_DIR as argument
-        node -- "$SCRIPT_DIR" << 'EOF'
+        # Create a temporary Node.js script file to avoid escape sequence issues
+        MERGE_SCRIPT=$(mktemp /tmp/merge-settings.XXXXX.js)
+        cat > "$MERGE_SCRIPT" << 'NODEJS_EOF'
 const fs = require('fs');
 const path = require('path');
 
@@ -165,7 +166,11 @@ if (existingSettings[stylesheetKey] && newSettings[stylesheetKey]) {
 fs.mkdirSync(settingsDir, { recursive: true });
 fs.writeFileSync(userSettingsFile, JSON.stringify(mergedSettings, null, 2));
 console.log('Settings merged successfully');
-EOF
+NODEJS_EOF
+        
+        # Run the script and clean up
+        node "$MERGE_SCRIPT" "$SCRIPT_DIR"
+        rm -f "$MERGE_SCRIPT"
     echo -e "${GREEN}✓ Settings merged${NC}"
     # No existing settings, just copy
     cp "$SCRIPT_DIR/settings.json" "$SETTINGS_FILE"
