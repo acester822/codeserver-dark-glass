@@ -1,7 +1,7 @@
 /* I still need to check over this AI conversion, as it may not be perfect */
 
 body:has([id='workbench.parts.editor']){
-  background-image: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url("../backgrounds/wave.jpg") !important;
+  background-image: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url("../backgrounds/grid.jpg") !important;
   background-size:cover !important;
   background-repeat:no-repeat !important;
   background-attachment:fixed !important;
