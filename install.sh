@@ -58,7 +58,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [ ! -f "$SCRIPT_DIR/package.json" ]; then
     echo "⚙️  installer running from remote - cloning repository to a temporary folder..."
     REPO_URL="https://github.com/acester822/codeserver-dark-glass.git"
-    CLONE_DIR="$(mktemp -d /tmp/codeserver-dark-glass.XXXX)"
+    CLONE_DIR="$(mktemp -d $HOME/codeserver-dark-glass.XXXX)"
     # attempt a shallow clone
     if git clone --depth 1 "$REPO_URL" "$CLONE_DIR" >/dev/null 2>&1; then
         echo "  ✓ cloned $REPO_URL -> $CLONE_DIR"
