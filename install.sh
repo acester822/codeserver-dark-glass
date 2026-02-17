@@ -117,8 +117,8 @@ if [ -f "$SETTINGS_FILE" ]; then
     # Read the existing settings and merge
     echo "   Merging Dark Glass settings with your existing settings..."
 
-        # Merge settings using Node.js
-        node << EOF
+        # Merge settings using Node.js - pass SCRIPT_DIR as argument
+        node -- "$SCRIPT_DIR" << 'EOF'
 const fs = require('fs');
 const path = require('path');
 
@@ -129,11 +129,11 @@ function stripJsonc(text) {
     // Remove multi-line comments
     text = text.replace(/\/\*[\s\S]*?\*\//g, '');
     // Remove trailing commas before } or ]
-    text = text.replace(/,\s*([}\]])/g, '\$1');
+    text = text.replace(/,\s*([}\]])/g, '$1');
     return text;
 }
 
-const scriptDir = '$SCRIPT_DIR';
+const scriptDir = process.argv[1];
 const settingsFilePath = path.join(scriptDir, 'settings.json');
 
 if (!fs.existsSync(settingsFilePath)) {
