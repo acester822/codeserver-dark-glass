@@ -22,6 +22,32 @@ fi
 
 echo -e "${GREEN}✓ code-server CLI found${NC}"
 
+# Check for Node.js and install if missing
+if ! command -v node &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Node.js not found. Installing nodejs...${NC}"
+    if command -v pacman &> /dev/null; then
+        # Arch Linux
+        sudo pacman -S --noconfirm nodejs npm
+    elif command -v apt-get &> /dev/null; then
+        # Debian/Ubuntu
+        sudo apt-get update
+        sudo apt-get install -y nodejs npm
+    elif command -v dnf &> /dev/null; then
+        # Fedora/RHEL
+        sudo dnf install -y nodejs npm
+    elif command -v brew &> /dev/null; then
+        # macOS
+        brew install node
+    else
+        echo -e "${RED}❌ Could not determine package manager to install Node.js${NC}"
+        echo "Please install Node.js manually and try again."
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Node.js installed${NC}"
+else
+    echo -e "${GREEN}✓ Node.js found${NC}"
+fi
+
 # Get the directory where this script is located. When the script is fetched via
 # curl | bash it runs from a temporary location — in that case clone the repo to
 # a temp dir so we can access the repo files (package.json, themes, custom, etc.).
@@ -91,9 +117,8 @@ if [ -f "$SETTINGS_FILE" ]; then
     # Read the existing settings and merge
     echo "   Merging Islands Dark settings with your existing settings..."
 
-        # Create a temporary file with the merge logic using node.js if available
-        if command -v node &> /dev/null; then
-                node << 'NODE_SCRIPT'
+        # Merge settings using Node.js
+        node << 'NODE_SCRIPT'
 const fs = require('fs');
 const path = require('path');
 
@@ -134,10 +159,6 @@ fs.mkdirSync(settingsDir, { recursive: true });
 fs.writeFileSync(settingsFile, JSON.stringify(mergedSettings, null, 2));
 console.log('Settings merged successfully');
 NODE_SCRIPT
-        else
-                echo -e "${YELLOW}   Node.js not found. Please manually merge settings.json from this repo into your code-server settings.${NC}"
-                echo "   Your original settings have been backed up to settings.json.backup"
-        fi
 else
     # No existing settings, just copy
     cp "$SCRIPT_DIR/settings.json" "$SETTINGS_FILE"
