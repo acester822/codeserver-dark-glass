@@ -286,9 +286,15 @@ echo ""
 echo ""
 echo -e "${BLUE}🔧 Step 3: Add Custom Theming Capabilities to Code-Server${NC}"
 echo "  • Fixing file permissions (sudo may be required)"
-echo "  • Adding a custom directory"
-echo "  • Injecting CSS import into workbench"
-echo "  • Creating workbench -> custom symlink"
+
+# Fix file permissions quietly (only warn on failure)
+for d in "$HOME/.config/code-server" "$HOME/.local/share/code-server" "/usr/lib/code-server"; do
+    if [ -d "$d" ]; then
+        sudo chown -R "$(whoami)" "$d" 2>/dev/null || echo "    ⚠️  failed to chown $d (check permissions)"
+    fi
+done
+
+echo "  • Adding custom theming directory"
 
 CUSTOM_SRC="$SCRIPT_DIR/custom"
 USER_CUSTOM_DIR="$HOME/.local/share/code-server/custom"
@@ -297,12 +303,7 @@ WORKBENCH_CANDIDATES=(
     "/usr/lib/code-server/lib/vscode/out/vs/workbench/workbench.css"
 )
 
-# Fix file permissions quietly (only warn on failure)
-for d in "$HOME/.config/code-server" "$HOME/.local/share/code-server" "/usr/lib/code-server"; do
-    if [ -d "$d" ]; then
-        sudo chown -R "$(whoami)" "$d" 2>/dev/null || echo "    ⚠️  failed to chown $d (check permissions)"
-    fi
-done
+echo "  • Injecting CSS import into workbench"
 
 # locate workbench.css
 WORKBENCH_CSS=""
@@ -332,6 +333,8 @@ else
         sudo chown -R "$(whoami)" "$USER_CUSTOM_DIR" 2>/dev/null || true
     fi
 
+echo "  • Creating workbench -> custom symlink"
+
     # create symlink from workbench folder to user custom folder (quiet)
     WORKBENCH_DIR=$(dirname "$WORKBENCH_CSS")
     sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" 2>/dev/null || true
@@ -344,6 +347,6 @@ if [ -n "$WORKBENCH_CSS" ]; then
     echo -e "${BLUE}${BOLD}  Custom Theme Folder Symlink Location: $WORKBENCH_DIR/custom${NC}"
 fi
 echo ""
-echo -e "${GREEN}Done! 🏝️ Ace911's Dark Glass Theme installed!${NC}"
+echo -e "${GREEN}Done! 🏝️  Ace911's Dark Glass Theme installed!${NC}"
 echo ""
 echo ""
