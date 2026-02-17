@@ -11,6 +11,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Check for code-server CLI
@@ -284,6 +285,7 @@ echo ""
 
 echo ""
 echo -e "${BLUE}🔧 Step 3: Add Custom Theming Capabilities to Code-Server${NC}"
+echo "  • Fixing file permissions (sudo may be required)"
 echo "  • Adding a custom directory"
 echo "  • Injecting CSS import into workbench"
 echo "  • Creating workbench -> custom symlink"
@@ -295,14 +297,10 @@ WORKBENCH_CANDIDATES=(
     "/usr/lib/code-server/lib/vscode/out/vs/workbench/workbench.css"
 )
 
-echo ""
-echo "• Adjusting ownership so code-server can load user customizations (sudo may be required)"
+# Fix file permissions quietly (only warn on failure)
 for d in "$HOME/.config/code-server" "$HOME/.local/share/code-server" "/usr/lib/code-server"; do
     if [ -d "$d" ]; then
-        echo "  - chown $d -> $(whoami)"
-        sudo chown -R "$(whoami)" "$d" || echo "    ⚠️  failed to chown $d (check permissions)"
-    else
-        echo "  - skipping $d (not found)"
+        sudo chown -R "$(whoami)" "$d" 2>/dev/null || echo "    ⚠️  failed to chown $d (check permissions)"
     fi
 done
 
@@ -321,48 +319,35 @@ fi
 if [ -z "$WORKBENCH_CSS" ]; then
     echo -e "${YELLOW}⚠️  workbench.css not found under /usr/lib/code-server — skipping CSS injection step${NC}"
 else
-    echo ""
-    echo "• workbench.css -> $WORKBENCH_CSS"
-
-    # backup and inject import if missing
-    if sudo grep -q '@import url("./custom/active.css");' "$WORKBENCH_CSS" 2>/dev/null; then
-        echo "  - import already present in workbench.css"
-    else
-        echo "  - backing up workbench.css -> ${WORKBENCH_CSS}.bak"
-        sudo cp "$WORKBENCH_CSS" "${WORKBENCH_CSS}.bak" || true
-        echo "  - inserting @import at top of workbench.css"
-        sudo sed -i '1i @import url("./custom/active.css");' "$WORKBENCH_CSS" || echo "    ⚠️  failed to inject — try running script with sudo"
+    # backup and inject import if missing (quiet)
+    if ! sudo grep -q '@import url("./custom/active.css");' "$WORKBENCH_CSS" 2>/dev/null; then
+        sudo cp "$WORKBENCH_CSS" "${WORKBENCH_CSS}.bak" 2>/dev/null || true
+        sudo sed -i '1i @import url("./custom/active.css");' "$WORKBENCH_CSS" 2>/dev/null || true
     fi
 
-    # copy custom/ to user data
+    # copy custom/ to user data (quiet)
     if [ -d "$CUSTOM_SRC" ]; then
-        echo "  - copying custom/ -> $USER_CUSTOM_DIR"
         mkdir -p "$USER_CUSTOM_DIR"
-        rsync -a --delete "$CUSTOM_SRC/" "$USER_CUSTOM_DIR/"
-        sudo chown -R "$(whoami)" "$USER_CUSTOM_DIR" || true
-    else
-        echo "  - no local 'custom/' folder found in the repo — skipping copy"
+        rsync -a --delete "$CUSTOM_SRC/" "$USER_CUSTOM_DIR/" 2>/dev/null || true
+        sudo chown -R "$(whoami)" "$USER_CUSTOM_DIR" 2>/dev/null || true
     fi
 
-    # create symlink from workbench folder to user custom folder
+    # create symlink from workbench folder to user custom folder (quiet)
     WORKBENCH_DIR=$(dirname "$WORKBENCH_CSS")
-    if [ -L "$WORKBENCH_DIR/custom" ] || [ -d "$WORKBENCH_DIR/custom" ]; then
-        echo "  - removing existing $WORKBENCH_DIR/custom"
-        sudo rm -rf "$WORKBENCH_DIR/custom" || true
-    fi
-    echo "  - creating symlink: $WORKBENCH_DIR/custom -> $USER_CUSTOM_DIR"
-    sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" || echo "    ⚠️  failed to create symlink (permission denied)"
+    sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" 2>/dev/null || true
 fi
 
 echo ""
 echo -e "${GREEN}✅ Built-in custom theming steps complete${NC}"
 echo "Restart code-server (or refresh browser) to see changes."
 echo ""
-echo "Relevant locations:"
-echo "  Custom Theme Folder: $USER_CUSTOM_DIR"
+echo ""
+echo -e "${BLUE}${BOLD}Relevant locations:${NC}"
+echo -e "${BLUE}${BOLD}  Custom Theme Folder: $USER_CUSTOM_DIR${NC}"
 if [ -n "$WORKBENCH_CSS" ]; then
-    echo "  Custom Theme Folder Symlink Location: $WORKBENCH_DIR/custom"
+    echo -e "${BLUE}${BOLD}  Custom Theme Folder Symlink Location: $WORKBENCH_DIR/custom${NC}"
 fi
 echo ""
-echo -e "${GREEN}Done! 🏝️${NC}"
+echo -e "${GREEN}Done! 🏝️ Ace911's Dark Glass Theme installed!${NC}"
 echo ""
+    sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" || echo "    ⚠️  failed to create symlink (permission denied)"
