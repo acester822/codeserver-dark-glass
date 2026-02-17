@@ -123,18 +123,54 @@ if [ -f "$SETTINGS_FILE" ]; then
 const fs = require('fs');
 const path = require('path');
 
-// Strip JSONC features (comments and trailing commas) for JSON.parse
+// Strip JSONC features (comments and trailing commas) so JSON.parse can handle it
 function stripJsonc(text) {
-    // Remove single-line comments (but not // inside strings)
-    text = text.replace(/\/\/(?=(?:[^"\\]|\\.)*$)/gm, '');
-    // Remove multi-line comments
-    text = text.replace(/\/\*[\s\S]*?\*\//g, '');
+    let result = '';
+    let i = 0;
+    let inString = false;
+    while (i < text.length) {
+        // Handle strings (skip over escaped characters)
+        if (inString) {
+            if (text[i] === '\\') {
+                result += text[i] + (text[i + 1] || '');
+                i += 2;
+                continue;
+            }
+            if (text[i] === '"') {
+                inString = false;
+            }
+            result += text[i];
+            i++;
+            continue;
+        }
+        // Start of string
+        if (text[i] === '"') {
+            inString = true;
+            result += text[i];
+            i++;
+            continue;
+        }
+        // Single-line comment
+        if (text[i] === '/' && text[i + 1] === '/') {
+            while (i < text.length && text[i] !== '\n') i++;
+            continue;
+        }
+        // Multi-line comment
+        if (text[i] === '/' && text[i + 1] === '*') {
+            i += 2;
+            while (i < text.length && !(text[i] === '*' && text[i + 1] === '/')) i++;
+            i += 2;
+            continue;
+        }
+        result += text[i];
+        i++;
+    }
     // Remove trailing commas before } or ]
-    text = text.replace(/,\s*([}\]])/g, '$1');
-    return text;
+    result = result.replace(/,\s*([}\]])/g, '$1');
+    return result;
 }
 
-const scriptDir = process.argv[1];
+const scriptDir = process.argv[2];
 const settingsFilePath = path.join(scriptDir, 'settings.json');
 
 if (!fs.existsSync(settingsFilePath)) {
@@ -172,6 +208,7 @@ NODEJS_EOF
         node "$MERGE_SCRIPT" "$SCRIPT_DIR"
         rm -f "$MERGE_SCRIPT"
     echo -e "${GREEN}✓ Settings merged${NC}"
+else
     # No existing settings, just copy
     cp "$SCRIPT_DIR/settings.json" "$SETTINGS_FILE"
     echo -e "${GREEN}✓ Settings applied${NC}"
