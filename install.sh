@@ -118,7 +118,8 @@ if [ -f "$SETTINGS_FILE" ]; then
     echo "   Merging Islands Dark settings with your existing settings..."
 
         # Merge settings using Node.js
-        node << 'NODE_SCRIPT'
+        SCRIPT_DIR_ESCAPED=$(printf '%s\n' "$SCRIPT_DIR" | sed 's/[\/&]/\\&/g')
+        node << NODE_SCRIPT
 const fs = require('fs');
 const path = require('path');
 
@@ -133,17 +134,24 @@ function stripJsonc(text) {
     return text;
 }
 
-const scriptDir = process.cwd();
-const newSettings = JSON.parse(stripJsonc(fs.readFileSync(path.join(scriptDir, 'settings.json'), 'utf8')));
+const scriptDir = '$SCRIPT_DIR';
+const settingsFilePath = path.join(scriptDir, 'settings.json');
+
+if (!fs.existsSync(settingsFilePath)) {
+    console.error('Error: settings.json not found in ' + scriptDir);
+    process.exit(1);
+}
+
+const newSettings = JSON.parse(stripJsonc(fs.readFileSync(settingsFilePath, 'utf8')));
 
 const home = process.env.HOME;
 // Use code-server user settings exclusively
 const settingsDir = path.join(home, '.local/share/code-server/User');
-const settingsFile = path.join(settingsDir, 'settings.json');
-const existingText = fs.existsSync(settingsFile) ? fs.readFileSync(settingsFile, 'utf8') : '{}';
+const userSettingsFile = path.join(settingsDir, 'settings.json');
+const existingText = fs.existsSync(userSettingsFile) ? fs.readFileSync(userSettingsFile, 'utf8') : '{}';
 const existingSettings = JSON.parse(stripJsonc(existingText));
 
-// Merge settings - Islands Dark settings take precedence
+// Merge settings - new settings take precedence
 const mergedSettings = { ...existingSettings, ...newSettings };
 
 // Deep merge custom-ui-style.stylesheet
@@ -156,7 +164,7 @@ if (existingSettings[stylesheetKey] && newSettings[stylesheetKey]) {
 }
 
 fs.mkdirSync(settingsDir, { recursive: true });
-fs.writeFileSync(settingsFile, JSON.stringify(mergedSettings, null, 2));
+fs.writeFileSync(userSettingsFile, JSON.stringify(mergedSettings, null, 2));
 console.log('Settings merged successfully');
 NODE_SCRIPT
 else
