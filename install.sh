@@ -126,3 +126,83 @@ fi
 
 echo ""
 echo -e "${GREEN}Done! 🏝️${NC}"
+
+echo ""
+echo "🔧 Step 3: (optional) Install CSS directly into code-server (no Custom UI Style)"
+echo "    — will copy 'custom/' into your code-server user data, inject an @import into workbench.css,
+            create a symlink from the workbench folder to the user 'custom' folder, and install Seti Folder icon theme."
+
+# Direct-theming steps provided by user (idempotent where possible)
+CUSTOM_SRC="$SCRIPT_DIR/custom"
+USER_CUSTOM_DIR="$HOME/.local/share/code-server/custom"
+WORKBENCH_CANDIDATES=(
+    "/usr/lib/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.css"
+    "/usr/lib/code-server/lib/vscode/out/vs/workbench/workbench.css"
+)
+
+echo "\n• Adjusting ownership so code-server can load user customizations (sudo may be required)"
+for d in "$HOME/.config/code-server" "$HOME/.local/share/code-server" "/usr/lib/code-server"; do
+    if [ -d "$d" ]; then
+        echo "  - chown $d -> $(whoami)"
+        sudo chown -R "$(whoami)" "$d" || echo "    ⚠️  failed to chown $d (check permissions)"
+    else
+        echo "  - skipping $d (not found)"
+    fi
+done
+
+# locate workbench.css
+WORKBENCH_CSS=""
+for p in "${WORKBENCH_CANDIDATES[@]}"; do
+    if [ -f "$p" ]; then
+        WORKBENCH_CSS="$p"
+        break
+    fi
+done
+if [ -z "$WORKBENCH_CSS" ]; then
+    WORKBENCH_CSS=$(sudo find /usr/lib/code-server -type f -name 'workbench.css' 2>/dev/null | head -n 1 || true)
+fi
+
+if [ -z "$WORKBENCH_CSS" ]; then
+    echo -e "${YELLOW}⚠️  workbench.css not found under /usr/lib/code-server — skipping CSS injection step${NC}"
+else
+    echo "\n• workbench.css -> $WORKBENCH_CSS"
+
+    # backup and inject import if missing
+    if sudo grep -q '@import url("./custom/active.css");' "$WORKBENCH_CSS" 2>/dev/null; then
+        echo "  - import already present in workbench.css"
+    else
+        echo "  - backing up workbench.css -> ${WORKBENCH_CSS}.bak"
+        sudo cp "$WORKBENCH_CSS" "${WORKBENCH_CSS}.bak" || true
+        echo "  - inserting @import at top of workbench.css"
+        sudo sed -i '1i @import url("./custom/active.css");' "$WORKBENCH_CSS" || echo "    ⚠️  failed to inject — try running script with sudo"
+    fi
+
+    # copy custom/ to user data
+    if [ -d "$CUSTOM_SRC" ]; then
+        echo "  - copying custom/ -> $USER_CUSTOM_DIR"
+        mkdir -p "$USER_CUSTOM_DIR"
+        rsync -a --delete "$CUSTOM_SRC/" "$USER_CUSTOM_DIR/"
+        sudo chown -R "$(whoami)" "$USER_CUSTOM_DIR" || true
+    else
+        echo "  - no local 'custom/' folder found in the repo — skipping copy"
+    fi
+
+    # create symlink from workbench folder to user custom folder
+    WORKBENCH_DIR=$(dirname "$WORKBENCH_CSS")
+    if [ -L "$WORKBENCH_DIR/custom" ] || [ -d "$WORKBENCH_DIR/custom" ]; then
+        echo "  - removing existing $WORKBENCH_DIR/custom"
+        sudo rm -rf "$WORKBENCH_DIR/custom" || true
+    fi
+    echo "  - creating symlink: $WORKBENCH_DIR/custom -> $USER_CUSTOM_DIR"
+    sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" || echo "    ⚠️  failed to create symlink (permission denied)"
+fi
+
+# install recommended icon theme for best results
+echo "\n• Installing recommended icon theme: l-igh-t.vscode-theme-seti-folder"
+if code-server --install-extension l-igh-t.vscode-theme-seti-folder --force 2>/dev/null; then
+    echo -e "${GREEN}✓ Seti Folder icon theme installed${NC}"
+else
+    echo -e "${YELLOW}⚠️  Could not install Seti Folder automatically. Run: code-server --install-extension l-igh-t.vscode-theme-seti-folder${NC}"
+fi
+
+echo "\n✅ Built-in custom theming steps complete. Restart code-server (or refresh browser) to see changes."
