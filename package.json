@@ -1,6 +1,6 @@
 {
-  "name": "islands-dark",
-  "displayName": "Islands Dark",
+  "name": "dark-glass",
+  "displayName": "Dark Glass",
   "description": "A dark color theme inspired by JetBrains Islands Dark — deep backgrounds, warm syntax highlighting, and a clean modern aesthetic.",
   "version": "1.0.0",
   "publisher": "acester822",
@@ -21,14 +21,14 @@
   "icon": "icon.png",
   "repository": {
     "type": "git",
-  "url": "https://github.com/acester822/vscode-dark-islands"
+  "url": "https://github.com/acester822/codeserver-dark-glass"
   },
   "contributes": {
     "themes": [
       {
-        "label": "Islands Dark",
+        "label": "Dark Glass",
         "uiTheme": "vs-dark",
-        "path": "./themes/islands-dark.json"
+        "path": "./themes/dark-glass.json"
       }
     ]
   }

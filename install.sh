@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🏝️  Islands Dark Theme Installer for code-server"
+echo "🏝️  Ace911's Dark Glass Installer for code-server"
 echo "================================================"
 echo ""
 
@@ -26,7 +26,7 @@ echo -e "${GREEN}✓ code-server CLI found${NC}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo ""
-echo "📦 Step 1: Installing Islands Dark theme extension..."
+echo "📦 Step 1: Installing Ace911's Dark Glass Theme extension..."
 
 # Read extension identity from package.json so we don't hard-code the publisher/name/version
 EXT_PUBLISHER=$(sed -n 's/.*"publisher"\s*:\s*"\([^"]*\)".*/\1/p' "$SCRIPT_DIR/package.json" || true)

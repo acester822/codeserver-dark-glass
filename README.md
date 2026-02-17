@@ -27,22 +27,12 @@ A dark color theme for code-server with a modern glass-inspired aesthetic. Featu
 
 This theme is designed exclusively for **code-server**.
 
-### One-Liner Install (Recommended)
+### One-Line Automatic Install
 
 The fastest way to install:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/acester822/codeserver-dark-glass/main/install.sh | bash
-```
-
-### Manual Clone Install
-
-If you prefer to clone first:
-
-```bash
-git clone https://github.com/acester822/codeserver-dark-glass.git codeserver-dark-glass
-cd codeserver-dark-glass
-./install.sh
 ```
 
 The script will automatically:
@@ -51,35 +41,8 @@ The script will automatically:
 - ✅ Apply the theme
 
 > **Note:** code-server must be installed and available in your PATH.
-
-### Manual Installation
-
-If you prefer to install manually, follow these steps:
-
-#### Step 1: Install the theme for code-server
-
-Clone this repo and copy the extension files:
-
-```bash
-git clone https://github.com/acester822/codeserver-dark-glass.git codeserver-dark-glass
-cd codeserver-dark-glass
-mkdir -p ~/.local/share/code-server/extensions/acester822.codeserver-dark-glass-1.0.0
-cp package.json ~/.local/share/code-server/extensions/acester822.codeserver-dark-glass-1.0.0/
-cp -r themes ~/.local/share/code-server/extensions/acester822.codeserver-dark-glass-1.0.0/
-```
-
-#### Step 2: Apply the settings
-
-Copy the contents of `settings.json` from this repo into your code-server settings:
-
-1. Edit `~/.local/share/code-server/User/settings.json`
-2. Merge the contents of this repo's `settings.json` into your settings file
-
-> **Note:** If you already have existing settings, merge carefully. The key setting is `workbench.colorTheme`.
-
-#### Step 3: Reload code-server
-
-Refresh your browser or restart the code-server service to apply the theme.
+>
+> If not installed, install code-server following the [official instructions](https://coder.com/docs/code-server/install).
 
 ## What the theme includes
 
@@ -107,7 +70,7 @@ Ensure code-server is installed and available in your PATH:
 which code-server
 ```
 
-If not installed, install code-server following the [official instructions](https://coder.com/docs/code-server/install).
+
 
 ## Credits
 

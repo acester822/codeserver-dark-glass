@@ -1,0 +1,43 @@
+
+@font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: light;
+  }
+  
+  @font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+  } 
+  
+  @font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-Heavy.woff2') format('woff2');
+    font-weight: 500;
+    font-style: medium;
+  }
+  
+  @font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-DemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: semibold;
+  }
+  
+  @font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-ExtraBold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: bold;
+  }
+  
+  @font-face {
+    font-family: 'Cartograph';
+    src: url('../fonts/CartographCF-RegularItalic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+  }
+

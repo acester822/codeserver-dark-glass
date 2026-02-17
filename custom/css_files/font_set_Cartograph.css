@@ -1,0 +1,21 @@
+.split-view-view {
+    font-family: "Cartograph" !important;
+  }
+  
+  .split-view-view > .sidebar > .content > .viewlet{
+    font-family: "Cartograph" !important;
+    font-weight: bold;
+  }
+  
+  .tabs-and-actions-container {
+    font-family: "Cartograph" !important;
+    font-weight: bold;
+  }
+  
+  .monaco-breadcrumbs {
+    font-family: "Cartograph" !important;
+  }
+  
+  .split-view-view > .top {
+    font-family: "Cartograph" !important;
+  }
