@@ -22,8 +22,29 @@ fi
 
 echo -e "${GREEN}✓ code-server CLI found${NC}"
 
-# Get the directory where this script is located
+# Get the directory where this script is located. When the script is fetched via
+# curl | bash it runs from a temporary location — in that case clone the repo to
+# a temp dir so we can access the repo files (package.json, themes, custom, etc.).
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# If package.json isn't next to the script assume we're running from a remote
+# one-liner; clone the repository into a temp dir and continue from there.
+if [ ! -f "$SCRIPT_DIR/package.json" ]; then
+    echo "⚙️  installer running from remote - cloning repository to a temporary folder..."
+    REPO_URL="https://github.com/acester822/codeserver-dark-glass.git"
+    CLONE_DIR="$(mktemp -d /tmp/codeserver-dark-glass.XXXX)"
+    # attempt a shallow clone
+    if git clone --depth 1 "$REPO_URL" "$CLONE_DIR" >/dev/null 2>&1; then
+        echo "  ✓ cloned $REPO_URL -> $CLONE_DIR"
+        SCRIPT_DIR="$CLONE_DIR"
+        # cleanup on exit
+        trap 'rm -rf "$CLONE_DIR"' EXIT
+    else
+        echo -e "${RED}❌ Failed to download repository ($REPO_URL).${NC}"
+        echo "Please clone the repo and run the installer from the repo directory." 
+        exit 1
+    fi
+fi
 
 echo ""
 echo "📦 Step 1: Installing Ace911's Dark Glass Theme extension..."
