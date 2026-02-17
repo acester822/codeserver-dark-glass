@@ -338,10 +338,6 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}✅ Built-in custom theming steps complete${NC}"
-echo "Restart code-server (or refresh browser) to see changes."
-echo ""
-echo ""
 echo -e "${BLUE}${BOLD}Relevant locations:${NC}"
 echo -e "${BLUE}${BOLD}  Custom Theme Folder: $USER_CUSTOM_DIR${NC}"
 if [ -n "$WORKBENCH_CSS" ]; then
@@ -350,4 +346,4 @@ fi
 echo ""
 echo -e "${GREEN}Done! 🏝️ Ace911's Dark Glass Theme installed!${NC}"
 echo ""
-    sudo ln -sfn "$USER_CUSTOM_DIR" "$WORKBENCH_DIR/custom" || echo "    ⚠️  failed to create symlink (permission denied)"
+echo ""
