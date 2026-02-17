@@ -91,7 +91,7 @@ if [ -f "$SETTINGS_FILE" ]; then
     # Read the existing settings and merge
     echo "   Merging Islands Dark settings with your existing settings..."
 
-        # Create a temporary file with the merge logic using node.js if available
+        # Create a temporary file with the merge logic. Prefer node, but fall back to python3
         if command -v node &> /dev/null; then
                 node << 'NODE_SCRIPT'
 const fs = require('fs');
@@ -135,9 +135,50 @@ if (existingSettings[stylesheetKey] && newSettings[stylesheetKey]) {
 fs.writeFileSync(settingsFile, JSON.stringify(mergedSettings, null, 2));
 console.log('Settings merged successfully ->', settingsFile);
 NODE_SCRIPT
+        elif command -v python3 &> /dev/null; then
+                python3 - <<'PY'
+import json, os, re, sys
+
+def strip_jsonc(text):
+    # remove // comments (naive but effective for typical settings.json)
+    text = re.sub(r'//(?=(?:[^"\\]|\\.)*$).*', '', text, flags=re.M)
+    # remove /* */ comments
+    text = re.sub(r'/\*[\s\S]*?\*/', '', text)
+    # remove trailing commas
+    text = re.sub(r',\s*(?=[}\]])', '', text)
+    return text
+
+script_dir = os.getcwd()
+with open(os.path.join(script_dir, 'settings.json'), 'r', encoding='utf-8') as f:
+    new_raw = f.read()
+new = json.loads(strip_jsonc(new_raw))
+
+home = os.environ.get('HOME')
+settings_dir = os.path.join(home, '.local/share/code-server/User')
+settings_file = os.path.join(settings_dir, 'settings.json')
+
+existing = {}
+if os.path.exists(settings_file):
+    with open(settings_file, 'r', encoding='utf-8') as f:
+        existing = json.loads(strip_jsonc(f.read()))
+
+merged = dict(existing)
+merged.update(new)
+
+stylesheet_key = 'custom-ui-style.stylesheet'
+if isinstance(existing.get(stylesheet_key), dict) and isinstance(new.get(stylesheet_key), dict):
+    merged[stylesheet_key] = dict(existing.get(stylesheet_key))
+    merged[stylesheet_key].update(new.get(stylesheet_key))
+
+os.makedirs(settings_dir, exist_ok=True)
+with open(settings_file, 'w', encoding='utf-8') as f:
+    json.dump(merged, f, indent=2, ensure_ascii=False)
+
+print('Settings merged successfully ->', settings_file)
+PY
         else
-                echo -e "${RED}❌ Node.js not found. Cannot merge settings.${NC}"
-                exit 1
+                echo -e "${YELLOW}   Node.js and python3 not found. Please manually merge settings.json from this repo into your code-server settings.${NC}"
+                echo "   Your original settings have been backed up to settings.json.backup"
         fi
 else
     # No existing settings, just copy
