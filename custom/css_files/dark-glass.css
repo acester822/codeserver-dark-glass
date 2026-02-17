@@ -1,12 +1,26 @@
 /* I still need to check over this AI conversion, as it may not be perfect */
 
+body:has([id='workbench.parts.editor']){
+  background-image: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url("../backgrounds/wave.jpg") !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
+  background-position:center !important;
+  /*backdrop-filter:blur(3px);*/
+  opacity:0.9 !important;
+}
+
+.monaco-workbench.windows {
+    font-family: Cartograph, Segoe UI, sans-serif;
+}
+
 monaco-workbench {
   background-color: #121216 !important;
 }
 
 .part.sidebar {
   margin: 8px 8px 0 20px;
-  border-radius: 24px !important;
+  border-radius: 4px !important;
   overflow: hidden !important;
   max-height: calc(100% - 8px) !important;
   border-top: 1px solid rgba(255,255,255,0.1) !important;
@@ -97,7 +111,7 @@ monaco-workbench {
 
 .part.editor {
   margin: 8px 8px 0 8px;
-  border-radius: 24px !important;
+  border-radius: 4px !important;
   overflow: hidden !important;
   max-height: calc(100% - 16px) !important;
   border-top: 1px solid rgba(255,255,255,0.12) !important;
@@ -146,7 +160,7 @@ monaco-workbench {
 .minimap:hover canvas { opacity: 1 !important; }
 
 .monaco-hover {
-  border-radius: 12px !important;
+  border-radius: 4px !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   box-shadow: 0 4px 16px 0 rgba(0,0,0,0.4) !important;
   overflow: hidden !important;
@@ -174,7 +188,7 @@ monaco-workbench {
 
 .part.panel.bottom {
   margin: 0 8px;
-  border-radius: 14px;
+  border-radius: 4px;
   border-top: 1px solid rgba(255,255,255,0.1) !important;
   border-left: 1px solid rgba(255,255,255,0.06) !important;
   border-bottom: 1px solid rgba(255,255,255,0.02) !important;
@@ -183,8 +197,8 @@ monaco-workbench {
 }
 
 .part.panel.bottom .message-box-container,
-.part.panel.bottom .welcome-view-content { border-radius: 10px !important; margin: 4px !important; width: calc(100% - 34px) !important; box-sizing: border-box !important; }
-.part.panel.bottom .monaco-table { border-radius: 10px !important; width: calc(100% - 14px) !important; }
+.part.panel.bottom .welcome-view-content { border-radius: 4px !important; margin: 4px !important; width: calc(100% - 34px) !important; box-sizing: border-box !important; }
+.part.panel.bottom .monaco-table { border-radius: 4px !important; width: calc(100% - 14px) !important; }
 
 .part.activitybar {
   background: #121216 !important;
@@ -205,10 +219,18 @@ monaco-workbench {
 }
 
 .part.activitybar .content > div:last-child { transform: translateY(-10px) !important; }
-.part.activitybar .action-item .action-label { font-size: 18px !important; width: 30px !important; height: 30px !important; line-height: 30px !important; display: flex !important; align-items: center !important; justify-content: center !important; overflow: visible !important; }
-.part.activitybar .action-item .action-label .codicon { font-size: 18px !important; }
+.part.activitybar .composite-bar .monaco-action-bar .action-item .action-label { font-size: 18px !important; width: 30px !important; height: 30px !important; line-height: 30px !important; display: flex !important; align-items: center !important; justify-content: center !important; overflow: visible !important; }
+.part.activitybar .composite-bar .monaco-action-bar .action-item .action-label .codicon { font-size: 18px !important; }
 .part.activitybar .action-item .action-label img { max-width: 18px !important; max-height: 18px !important; }
 .part.activitybar .action-item .active-item-indicator { display: none !important; }
+.monaco-menu .action-label,
+.context-view .action-label,
+.monaco-menu .menu-item .action-label {
+  /* restore normal font for popup/context menu items (fixes activity-bar 3-line menu) */
+  font-size: 13px !important;
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  line-height: 20px !important;
+}
 .part.activitybar .action-item.checked .action-label { background: linear-gradient(180deg, rgba(55,56,62,0.9), rgba(40,41,46,0.7)) !important; border-radius: 50% !important; width: 30px !important; height: 30px !important; box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.12), inset 1px 0 0 0 rgba(255,255,255,0.06), inset 0 -1px 0 0 rgba(255,255,255,0.02), inset -1px 0 0 0 rgba(255,255,255,0.02), inset 0 1px 2px 0 rgba(255,255,255,0.05), 0 1px 3px 0 rgba(0,0,0,0.3) !important; }
 .part.activitybar .actions-container { align-items: center !important; justify-content: center !important; width: 100% !important; overflow: visible !important; }
 .part.activitybar .action-item { display: flex !important; justify-content: center !important; width: 100% !important; overflow: visible !important; }
@@ -228,19 +250,19 @@ monaco-workbench {
 .command-center-center * { border-radius: 9999px !important; }
 
 .notifications-toasts { margin-right: 8px !important; margin-bottom: 8px !important; }
-.notification-toast, .notifications-center { border-radius: 14px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 4px 12px 0 rgba(0,0,0,0.4) !important; }
-.notification-list-item-actions-container { border-radius: 8px !important; }
-.notification-list-item, .notification-list-item.focused { border-radius: 14px !important; overflow: hidden !important; }
+.notification-toast, .notifications-center { border-radius: 4px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 4px 12px 0 rgba(0,0,0,0.4) !important; }
+.notification-list-item-actions-container { border-radius: 4px !important; }
+.notification-list-item, .notification-list-item.focused { border-radius: 4px !important; overflow: hidden !important; }
 .notification-list-item.focused { outline-offset: -1px !important; }
-.monaco-list-row:has(.notification-list-item) { border-radius: 14px !important; overflow: hidden !important; }
+.monaco-list-row:has(.notification-list-item) { border-radius: 4px !important; overflow: hidden !important; }
 
-.part.auxiliarybar { margin: 8px 20px 0 8px; border-radius: 24px !important; overflow: hidden !important; max-height: calc(100% - 16px) !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3) !important; }
+.part.auxiliarybar { margin: 8px 20px 0 8px; border-radius: 4px !important; overflow: hidden !important; max-height: calc(100% - 16px) !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3) !important; }
 .part.auxiliarybar .composite.title { padding: 8px 0 0 20px !important; }
 .part.auxiliarybar .content { width: calc(100% - 20px) !important; }
 .part.auxiliarybar .split-view-view { max-height: calc(100% - 24px) !important; }
 .part.auxiliarybar .header { padding-left: 20px !important; }
 
-.quick-input-widget { border-radius: 16px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 8px 24px 0 rgba(0,0,0,0.5) !important; }
+.quick-input-widget { border-radius: 4px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 8px 24px 0 rgba(0,0,0,0.5) !important; }
 .quick-input-widget .monaco-list-row { border-radius: 6px !important; margin-left: 4px !important; margin-right: 4px !important; width: calc(100% - 8px) !important; transition: background 0.15s cubic-bezier(0.4,0,0.2,1) !important; }
 .quick-input-widget .monaco-list-row.focused { background: linear-gradient(135deg, rgba(49,50,56,0.7), rgba(37,38,44,0.5)) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06) !important; }
 
