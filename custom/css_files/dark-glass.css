@@ -1,7 +1,7 @@
 /* I still need to check over this AI conversion, as it may not be perfect */
 
 body:has([id='workbench.parts.editor']){
-  background-image: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url("../backgrounds/grid.jpg") !important;
+  background-image: linear-gradient( rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4) ), url("../backgrounds/wave-Dark-nord.jpg") !important;
   background-size:cover !important;
   background-repeat:no-repeat !important;
   background-attachment:fixed !important;
@@ -10,8 +10,8 @@ body:has([id='workbench.parts.editor']){
   opacity:0.9 !important;
 }
 
-.monaco-workbench.windows {
-    font-family: Cartograph, Segoe UI, sans-serif;
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container {
+    top: 10px;
 }
 
 monaco-workbench {
@@ -19,8 +19,8 @@ monaco-workbench {
 }
 
 .part.sidebar {
-  margin: 8px 8px 0 20px;
-  border-radius: 4px !important;
+  margin: 8px 1px 0 20px;
+  border-radius: 24px !important;
   overflow: hidden !important;
   max-height: calc(100% - 8px) !important;
   border-top: 1px solid rgba(255,255,255,0.1) !important;
@@ -65,16 +65,6 @@ monaco-workbench {
 .part.sidebar .label-name { font-size: 13px !important; }
 .part.sidebar .pane-header .title { font-size: 10px !important; }
 
-.explorer-folders-view .monaco-list-rows {
-  transform: translate3d(0, 0, 0) scaleY(1.15) !important;
-  transform-origin: top left !important;
-}
-
-.explorer-folders-view .monaco-tl-row {
-  transform: scaleY(0.87) !important;
-  transform-origin: top left !important;
-}
-
 .part.sidebar .monaco-list-row {
   border-radius: 6px !important;
   margin-left: 4px !important;
@@ -111,7 +101,7 @@ monaco-workbench {
 
 .part.editor {
   margin: 8px 8px 0 8px;
-  border-radius: 4px !important;
+  border-radius: 24px !important;
   overflow: hidden !important;
   max-height: calc(100% - 16px) !important;
   border-top: 1px solid rgba(255,255,255,0.12) !important;
@@ -160,7 +150,7 @@ monaco-workbench {
 .minimap:hover canvas { opacity: 1 !important; }
 
 .monaco-hover {
-  border-radius: 4px !important;
+  border-radius: 12px !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   box-shadow: 0 4px 16px 0 rgba(0,0,0,0.4) !important;
   overflow: hidden !important;
@@ -188,7 +178,7 @@ monaco-workbench {
 
 .part.panel.bottom {
   margin: 0 8px;
-  border-radius: 4px;
+  border-radius: 14px;
   border-top: 1px solid rgba(255,255,255,0.1) !important;
   border-left: 1px solid rgba(255,255,255,0.06) !important;
   border-bottom: 1px solid rgba(255,255,255,0.02) !important;
@@ -197,14 +187,19 @@ monaco-workbench {
 }
 
 .part.panel.bottom .message-box-container,
-.part.panel.bottom .welcome-view-content { border-radius: 4px !important; margin: 4px !important; width: calc(100% - 34px) !important; box-sizing: border-box !important; }
-.part.panel.bottom .monaco-table { border-radius: 4px !important; width: calc(100% - 14px) !important; }
+.part.panel.bottom .welcome-view-content { border-radius: 10px !important; margin: 4px !important; width: calc(100% - 34px) !important; box-sizing: border-box !important; }
+.part.panel.bottom .monaco-table { border-radius: 10px !important; width: calc(100% - 14px) !important; }
 
 .part.activitybar {
-  background: #121216 !important;
   margin: 8px 20px 30px 12px;
   width: 48px !important;
   min-width: 48px !important;
+  border-top: 1px solid rgba(255,255,255,0.1) !important;
+  border-left: 1px solid rgba(255,255,255,0.06) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.02) !important;
+  border-right: 1px solid rgba(255,255,255,0.02) !important;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3) !important;
+  border-radius: 12px;
 }
 
 .part.activitybar .composite-bar {
@@ -250,19 +245,19 @@ monaco-workbench {
 .command-center-center * { border-radius: 9999px !important; }
 
 .notifications-toasts { margin-right: 8px !important; margin-bottom: 8px !important; }
-.notification-toast, .notifications-center { border-radius: 4px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 4px 12px 0 rgba(0,0,0,0.4) !important; }
-.notification-list-item-actions-container { border-radius: 4px !important; }
-.notification-list-item, .notification-list-item.focused { border-radius: 4px !important; overflow: hidden !important; }
+.notification-toast, .notifications-center { border-radius: 14px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 4px 12px 0 rgba(0,0,0,0.4) !important; }
+.notification-list-item-actions-container { border-radius: 8px !important; }
+.notification-list-item, .notification-list-item.focused { border-radius: 14px !important; overflow: hidden !important; }
 .notification-list-item.focused { outline-offset: -1px !important; }
-.monaco-list-row:has(.notification-list-item) { border-radius: 4px !important; overflow: hidden !important; }
+.monaco-list-row:has(.notification-list-item) { border-radius: 14px !important; overflow: hidden !important; }
 
-.part.auxiliarybar { margin: 8px 20px 0 8px; border-radius: 4px !important; overflow: hidden !important; max-height: calc(100% - 16px) !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3) !important; }
+.part.auxiliarybar { margin: 8px 20px 0 8px; border-radius: 24px !important; overflow: hidden !important; max-height: calc(100% - 16px) !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3) !important; }
 .part.auxiliarybar .composite.title { padding: 8px 0 0 20px !important; }
 .part.auxiliarybar .content { width: calc(100% - 20px) !important; }
 .part.auxiliarybar .split-view-view { max-height: calc(100% - 24px) !important; }
 .part.auxiliarybar .header { padding-left: 20px !important; }
 
-.quick-input-widget { border-radius: 4px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 8px 24px 0 rgba(0,0,0,0.5) !important; }
+.quick-input-widget { border-radius: 16px !important; overflow: hidden !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-left: 1px solid rgba(255,255,255,0.06) !important; border-bottom: 1px solid rgba(255,255,255,0.02) !important; border-right: 1px solid rgba(255,255,255,0.02) !important; box-shadow: 0 8px 24px 0 rgba(0,0,0,0.5) !important; }
 .quick-input-widget .monaco-list-row { border-radius: 6px !important; margin-left: 4px !important; margin-right: 4px !important; width: calc(100% - 8px) !important; transition: background 0.15s cubic-bezier(0.4,0,0.2,1) !important; }
 .quick-input-widget .monaco-list-row.focused { background: linear-gradient(135deg, rgba(49,50,56,0.7), rgba(37,38,44,0.5)) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06) !important; }
 
